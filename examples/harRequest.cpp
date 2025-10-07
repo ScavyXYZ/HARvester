@@ -4,40 +4,49 @@
 
 int main()
 {
+    //Globally initialize curl
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    //open file
-    std::ifstream file("request.har");
-    if (!file) {
-        std::cout << "ERROR: Cannot open request.har" << std::endl;
-        return 1;
-    }
-    
-    //creating request obj
-    request* r = new request(file);
 
-    //sending request
+    //Har file example
+    std::ifstream reqHr("request.har");
+
+    //File is not open
+    if (!reqHr.is_open())
+    {
+        std::cerr << "Can not open request.har";
+        //exit
+        return -1;
+    }
+
+    //Create a request object with parameters from a file
+    request* r = new request(reqHr);
+
+    //send request
     r->send();
-    
+
     //if success
     if (r->isOK())
     {
-        std::cout << "Success" << std::endl;
-        std::cout << "Response Body:" << std::endl;
-        //print response
+        std::cout << "Success!" << std::endl;
+        
+        //Print response
+        std::cout << "Response: " << std::endl;
         std::cout << r->getResponse().getBody() << std::endl;
-        std::cout << "Response Headers:" << std::endl;
-        //print response headers
-        std::cout << r->getResponse().getHeaders();
+
+        //Print response headers
+        std::cout << "Response headers: " << std::endl;
+        std::cout << r->getResponse().getHeaders() << std::endl;
     }
     else
     {
-        std::cout << "ERROR: " << r->getError();
+        std::cerr << "ERROR: " << r->getError();
     }
+    
+    //Clean up memory
     delete r;
-    r = nullptr;
-    file.close();
-  
+
+    //Clean up curl globally
     curl_global_cleanup();
     return 0;
 }
