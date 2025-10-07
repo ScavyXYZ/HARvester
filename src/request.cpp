@@ -86,32 +86,6 @@ request::request(std::ifstream& file)
     }
 }
 
-request::request(const CURL* curl)
-{
-    if (curl)
-    {
-        m_curl = const_cast<CURL*>(curl);
-    }
-    else
-    {
-        m_curl = curl_easy_init();
-    }
-    if (m_curl)
-    {
-        m_response = new response;
-
-        setCurlOPT(CURLOPT_WRITEFUNCTION, defaultCallbackHandle);
-        setCurlOPT(CURLOPT_WRITEDATA, &m_response->body);
-
-        setCurlOPT(CURLOPT_HEADERFUNCTION, defaultHeaderHandle);
-        setCurlOPT(CURLOPT_HEADERDATA, &m_response->headers);
-    }
-    else
-    {
-        throw std::runtime_error("Curl init failure");
-    }
-}
-
 request::~request()
 {
     for (auto& iter : m_options) {
@@ -266,3 +240,4 @@ std::ostream& operator<<(std::ostream& os, const std::unordered_map<std::string,
     }
     return os;
 }
+
