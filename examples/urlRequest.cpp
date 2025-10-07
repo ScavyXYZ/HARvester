@@ -27,7 +27,7 @@ int main()
         std::cout << "ERROR: " << r->getError();
     }
     delete r;
-
+    r = nullptr;
     curl_global_cleanup();
     return 0;
 }
