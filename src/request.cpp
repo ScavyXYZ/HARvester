@@ -86,11 +86,37 @@ request::request(std::ifstream& file)
     }
 }
 
+request::request(const CURL* curl)
+{
+    if (curl)
+    {
+        m_curl = const_cast<CURL*>(curl);
+    }
+    else
+    {
+        m_curl = curl_easy_init();
+    }
+    if (m_curl)
+    {
+        m_response = new response;
+
+        setCurlOPT(CURLOPT_WRITEFUNCTION, defaultCallbackHandle);
+        setCurlOPT(CURLOPT_WRITEDATA, &m_response->body);
+
+        setCurlOPT(CURLOPT_HEADERFUNCTION, defaultHeaderHandle);
+        setCurlOPT(CURLOPT_HEADERDATA, &m_response->headers);
+    }
+    else
+    {
+        throw std::runtime_error("Curl init failure");
+    }
+}
+
 request::~request()
 {
-    for (auto& [option, param] : m_options) {
-        if (option == CURLOPT_POSTFIELDS || option == CURLOPT_COPYPOSTFIELDS) {
-            if (auto* str_ptr = std::any_cast<std::string*>(&param)) {
+    for (auto& iter : m_options) {
+        if (iter.first == CURLOPT_POSTFIELDS || iter.first == CURLOPT_COPYPOSTFIELDS) {
+            if (auto* str_ptr = std::any_cast<std::string*>(&iter.second)) {
                 delete* str_ptr;
             }
         }
