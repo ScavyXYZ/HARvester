@@ -27,6 +27,7 @@ public:
 	request();
 	request(const std::string& URL);
 	request(std::ifstream& file);
+	request(const CURL* curl);
 	~request();
 
 	template<typename T>
@@ -92,4 +93,5 @@ template<typename T>
 inline void request::setopt(const CURLoption& option, const T& parameter)
 {
 	m_options.push_back(std::make_pair(option, parameter));
+
 }
